@@ -81,34 +81,61 @@ class MongoDBHandler:
       result_collections = []
       remaining_strings = set(collection_names)
 
-      result = collection.find_one()
+      result = collection.find_one({"user": target_user})
       if result and "collectionNames" in result:
           user_collections = set(result["collectionNames"])
           result_collections = list(user_collections.intersection(remaining_strings))
           remaining_strings -= set(result_collections)
 
-      result_objects = []
+      collection_objects = []
+
       if not result_collections:
           matching_docs = collection_info.find({"fields": {"$in": list(remaining_strings)}})
           for doc in matching_docs:
               collection_name = doc["collectionName"]
               fields = doc["fields"]
               matching_fields = list(set(remaining_strings).intersection(set(fields)))
-              result_objects.append({
-                  "collectionName": collection_name,
-                  "fields": matching_fields
-              })
+              if matching_fields:
+                  collection_objects.append({
+                      "collectionName": collection_name,
+                      "fields": matching_fields
+                  })
+                  remaining_strings -= set(matching_fields)
       else:
           for collection_name in result_collections:
               info_doc = collection_info.find_one({"collectionName": collection_name})
               if info_doc and "fields" in info_doc:
                   matching_fields = list(set(remaining_strings).intersection(set(info_doc["fields"])))
-                  result_objects.append({
-                      "collectionName": collection_name,
-                      "fields": matching_fields
-                  })
+                  if matching_fields:
+                      collection_objects.append({
+                          "collectionName": collection_name,
+                          "fields": matching_fields
+                      })
+                      remaining_strings -= set(matching_fields)
 
-      return result_objects
+      leftover_strings = list(remaining_strings)
+
+      result_array = []
+      for item in collection_objects:
+        collection_name = item.get('collectionName')
+
+        if not collection_name:
+            continue
+
+        fields = item.get('fields', [])
+        collection = db[collection_name]
+        all_documents = list(collection.find())
+
+        for x in all_documents:
+          flag = True
+          for y in fields:
+            if x[y] not in leftover_strings:
+              flag = False
+              break
+          if(flag):
+            result_array.append(x)
+
+      return result_array
 
 
 from flask import Flask, request, jsonify
