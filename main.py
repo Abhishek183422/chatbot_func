@@ -120,29 +120,29 @@ class MongoDBHandler:
         result_array = []
         
         for item in collection_objects:
-        collection_name = item.get('collectionName')
-        
-        if not collection_name:
-            continue
-        
-        fields = item.get('fields', [])
-        
-        collection = db[collection_name]
-        
-        all_documents = list(collection.find())
-        
-        for x in all_documents:
-        
-          flag = True
-        
-          for y in fields:
-            if x[y] not in leftover_strings:
-              flag = False
-              break
-          
-          if(flag):
-            result_array.append(x)
-        
+            collection_name = item.get('collectionName')
+            
+            if not collection_name:
+                continue
+            
+            fields = item.get('fields', [])
+            
+            collection = db[collection_name]
+            
+            all_documents = list(collection.find())
+            
+            for x in all_documents:
+            
+              flag = True
+            
+              for y in fields:
+                if x[y] not in leftover_strings:
+                  flag = False
+                  break
+              
+              if(flag):
+                result_array.append(x)
+            
         return result_array
 
 
