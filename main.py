@@ -131,14 +131,14 @@ class MongoDBHandler:
                 flag = True
                 for y in fields:
                     if isinstance(x[y], ObjectId):
-                        x[y] = str(x[y])  # Convert ObjectId to string
+                        x[y] = str(x[y]) 
                     if x[y] not in leftover_strings:
                         flag = False
                         break
                 if flag:
-                    result_array.append(json_util.dumps(x))  # Use json_util.dumps to handle ObjectId serialization
+                    result_array.append(x)
     
-        return result_array
+        return {result_array}
 
 
 from flask import Flask, request, jsonify
