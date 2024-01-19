@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson import ObjectId
 
 class MongoDBHandler:
     # Class variable for MongoDB URI
@@ -129,6 +130,8 @@ class MongoDBHandler:
         for x in all_documents:
           flag = True
           for y in fields:
+            if isinstance(x[y], ObjectId):
+               x[y] = str(x[y])
             if x[y] not in leftover_strings:
               flag = False
               break
