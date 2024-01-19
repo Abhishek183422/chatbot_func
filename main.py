@@ -81,7 +81,7 @@ class MongoDBHandler:
       result_collections = []
       remaining_strings = set(collection_names)
 
-      result = collection.find_one({"user": target_user})
+      result = collection.find_one()
       if result and "collectionNames" in result:
           user_collections = set(result["collectionNames"])
           result_collections = list(user_collections.intersection(remaining_strings))
