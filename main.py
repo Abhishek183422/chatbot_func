@@ -148,6 +148,10 @@ from bson import json_util
 app = Flask(__name__)
 mongo_handler = MongoDBHandler()
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
+
 @app.route('/add_data', methods=['POST'])
 def add_data():
     try:
